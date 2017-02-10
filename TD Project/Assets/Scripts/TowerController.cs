@@ -11,6 +11,14 @@ public class TowerController : MonoBehaviour {
     public float turnSpeed=50f;
 
     public string enemyTag = "Enemy";
+
+    public float fireRate=1f;
+    private float fireCoutdown = 0f;
+
+    public GameObject bulletPrefab;
+    public Transform firePoint;
+
+
 	// Use this for initialization
 	void Start () {
         InvokeRepeating("UpdateTarget",0f,0.25f);
@@ -24,7 +32,25 @@ public class TowerController : MonoBehaviour {
         Quaternion lookRotation = Quaternion.LookRotation(dir);
         Vector3 rotation = Quaternion.Lerp(partToRotate.rotation,lookRotation,Time.deltaTime).eulerAngles;
         partToRotate.rotation = Quaternion.Euler(0f, rotation.y, 0f);
+
+        if (fireCoutdown <=0f)
+        {
+            Shoot();
+            fireCoutdown = 1f / fireRate;
+        }
+
+        fireCoutdown -= Time.deltaTime;
+
 	}
+
+    void Shoot()
+    {
+        GameObject bulletGO = (GameObject)Instantiate(bulletPrefab,firePoint.position, firePoint.rotation);
+        BulletConttroller bullet = bulletGO.GetComponent<BulletConttroller>();
+        if (bullet != null)
+            bullet.Seek(target);
+        Debug.Log("Shoot");
+    }
 
     void UpdateTarget()
     {
